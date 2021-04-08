@@ -8,7 +8,10 @@ import os, sys
 import argparse
 import locale
 
-from PyQt4 import QtCore, QtGui
+# from PyQt4 import QtCore, QtGui
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 APP_DESC = "fgallery image caption editor"
 ENCODING = locale.getpreferredencoding()
@@ -18,25 +21,25 @@ if sys.version_info.major < 3:
     str = unicode
 
 
-class ScaledImage(QtGui.QLabel):
+class ScaledImage(QLabel):
     def __init__(self):
         super(ScaledImage, self).__init__()
-        self._pixmap = QtGui.QPixmap()
+        self._pixmap = QPixmap()
 
     def setPixmap(self, pixmap):
         self._pixmap = pixmap
         if not pixmap.isNull():
-            pixmap = pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            pixmap = pixmap.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         super(ScaledImage, self).setPixmap(pixmap)
 
     def resizeEvent(self, ev):
         super(ScaledImage, self).resizeEvent(ev)
         if not self._pixmap.isNull():
-            pixmap = self._pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            pixmap = self._pixmap.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             super(ScaledImage, self).setPixmap(pixmap)
 
 
-class BackgroundLoader(QtCore.QThread):
+class BackgroundLoader(QThread):
     def __init__(self, path, size):
         super(BackgroundLoader, self).__init__()
         self.path = path
@@ -44,59 +47,59 @@ class BackgroundLoader(QtCore.QThread):
         self.image = None
 
     def run(self):
-        self.image = QtGui.QImage(self.path)
+        self.image = QImage(self.path)
         if not self.image.isNull() and self.size:
             self.image = self.image.scaled(self.size,
-                                           QtCore.Qt.KeepAspectRatio,
-                                           QtCore.Qt.SmoothTransformation)
+                                           Qt.KeepAspectRatio,
+                                           Qt.SmoothTransformation)
 
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle(APP_DESC)
 
         # construct UI
-        horizontalSplitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
-        verticalSplitter = QtGui.QSplitter(QtCore.Qt.Vertical)
+        horizontalSplitter = QSplitter(Qt.Horizontal)
+        verticalSplitter = QSplitter(Qt.Vertical)
         self.image = ScaledImage()
         self.image.setMinimumSize(480, 319)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(1)
         self.image.setSizePolicy(sizePolicy)
-        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        self.image.setAlignment(Qt.AlignCenter)
         verticalSplitter.addWidget(self.image)
-        horizontalLayout = QtGui.QHBoxLayout()
-        formLayout = QtGui.QFormLayout()
-        formLayout.setLabelAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, QtGui.QLabel("Title:"))
-        self.edit_title = QtGui.QLineEdit()
-        formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.edit_title)
-        formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, QtGui.QLabel("Description:"))
-        self.edit_desc = QtGui.QPlainTextEdit()
-        self.edit_desc.setLineWrapMode(QtGui.QPlainTextEdit.WidgetWidth)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        horizontalLayout = QHBoxLayout()
+        formLayout = QFormLayout()
+        formLayout.setLabelAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        formLayout.setWidget(0, QFormLayout.LabelRole, QLabel("Title:"))
+        self.edit_title = QLineEdit()
+        formLayout.setWidget(0, QFormLayout.FieldRole, self.edit_title)
+        formLayout.setWidget(1, QFormLayout.LabelRole, QLabel("Description:"))
+        self.edit_desc = QPlainTextEdit()
+        self.edit_desc.setLineWrapMode(QPlainTextEdit.WidgetWidth)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(1)
         self.edit_desc.setSizePolicy(sizePolicy)
-        formLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.edit_desc)
+        formLayout.setWidget(1, QFormLayout.FieldRole, self.edit_desc)
         horizontalLayout.addLayout(formLayout)
-        verticalLayout = QtGui.QVBoxLayout()
-        verticalLayout.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
-        self.btn_next = QtGui.QPushButton("&Next")
+        verticalLayout = QVBoxLayout()
+        verticalLayout.setSizeConstraint(QLayout.SetMinimumSize)
+        self.btn_next = QPushButton("&Next")
         verticalLayout.addWidget(self.btn_next)
-        self.btn_undo = QtGui.QPushButton("&Undo")
+        self.btn_undo = QPushButton("&Undo")
         verticalLayout.addWidget(self.btn_undo)
-        self.btn_prev = QtGui.QPushButton("&Previous")
+        self.btn_prev = QPushButton("&Previous")
         verticalLayout.addWidget(self.btn_prev)
         horizontalLayout.addLayout(verticalLayout)
-        widget = QtGui.QWidget()
+        widget = QWidget()
         widget.setLayout(horizontalLayout)
         verticalSplitter.addWidget(widget)
         horizontalSplitter.addWidget(verticalSplitter)
-        self.list_files = QtGui.QListWidget()
-        self.list_files.setIconSize(QtCore.QSize(64, 64))
+        self.list_files = QListWidget()
+        self.list_files.setIconSize(QSize(64, 64))
         horizontalSplitter.addWidget(self.list_files)
         self.setCentralWidget(horizontalSplitter)
 
@@ -134,7 +137,7 @@ class MainWindow(QtGui.QMainWindow):
         if not icon.isNull():
             crow = self.list_files.currentRow()
             item = self.list_files.takeItem(idx)
-            item.setIcon(QtGui.QIcon(QtGui.QPixmap(icon)))
+            item.setIcon(QIcon(QPixmap(icon)))
             self.list_files.insertItem(idx, item)
             self.list_files.setCurrentRow(crow)
         self.thumb_schedule()
@@ -171,7 +174,7 @@ class MainWindow(QtGui.QMainWindow):
         self.list_files.setCurrentRow(idx)
 
         path = self.files[idx]
-        pixmap = QtGui.QPixmap(path)
+        pixmap = QPixmap(path)
         if pixmap.isNull():
             self.image.setPixmap(pixmap)
             self.image.setText('Cannot load {}'.format(path))
@@ -229,7 +232,7 @@ def expand_dir(path):
                 yield tmp
 
 
-class Application(QtGui.QApplication):
+class Application(QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
 
@@ -241,7 +244,7 @@ class Application(QtGui.QApplication):
 
         # ask for a directory if no files were specified
         if not args.files:
-            path = QtGui.QFileDialog.getExistingDirectory(
+            path = QFileDialog.getExistingDirectory(
                 None, "Select an image directory")
             if not path: sys.exit(1)
             args.files = [str(path)]
