@@ -1,3 +1,13 @@
+
+##note:## 
+Archived, as is upstream
+the "fcaption" utility lives on for now as:
+
+https://github.com/TomConlin/gallery_shell/blob/master/fcaption.py
+
+
+
+
 fgallery: a modern, minimalist javascript photo gallery
 =======================================================
 
